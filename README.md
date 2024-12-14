@@ -6,3 +6,5 @@
 
 以下是书生大模型学习资料链接：
 https://github.com/InternLM/Tutorial
+
+参考文档：https://github.com/InternLM/Tutorial/blob/camp4/docs/L1/Prompt/practice.md
