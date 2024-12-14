@@ -250,8 +250,9 @@ def main():
     api_key = os.getenv("API_KEY")
     base_url = os.getenv("BASE_URL")
     model_name = os.getenv("MODEL_NAME")
+    script_prompt = "你是一个专业的剧本杀创作助手，正在帮助用户写剧本杀剧本。"
     print(base_url, model_name)
-    book_writer = BookWriter(api_key, base_url, model_name, system_prompt=None)
+    book_writer = BookWriter(api_key, base_url, model_name, system_prompt=script_prompt)
     book_writer.generate_book(custom_theme=book_theme, save_file=True)
 
 if __name__ == "__main__":
