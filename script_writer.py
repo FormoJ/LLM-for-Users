@@ -268,7 +268,7 @@ class BookWriter:
                 print(f"Attempt {attempt + 1} failed: {e}")
         return response
     
-    def generate_book(self, custom_theme=None, save_file=False) -> None:
+    def generate_book(self, custom_theme=None, save_file=False,save_path = "测试结果文件/") -> None:
         """生成整本书并将其保存到文件中。
 
         Args:
@@ -326,7 +326,7 @@ class BookWriter:
 
         print("\n整个剧本已生成完毕。")
         if save_file:
-            filename = f"books/{title.replace(' ', '_')}.md"
+            filename = f"{save_path}{title.replace(' ', '_')}.md"
             with open(filename, "w", encoding="utf-8") as f:
                 f.write(book_content)
             
@@ -342,8 +342,9 @@ def main():
     model_name = os.getenv("MODEL_NAME")
     script_prompt = "你是一个专业的剧本杀创作助手，正在帮助用户写剧本杀剧本。"
     print(base_url, model_name)
+    save_path = "books/"
     book_writer = BookWriter(api_key, base_url, model_name, system_prompt=script_prompt)
-    book_writer.generate_book(custom_theme=book_theme, save_file=True)
+    book_writer.generate_book(custom_theme=book_theme, save_file=True,save_path=save_path)
 
 if __name__ == "__main__":
     main()
