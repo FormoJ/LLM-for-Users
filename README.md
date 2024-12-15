@@ -6,7 +6,7 @@
 
 InternStudio：https://studio.intern-ai.org.cn/
 
-我的团队id：KbPJkggiNEMT
+我的团队id：**KbPJkggiNEMT**
 ## 简介
 剧本杀的创作要求内容严谨、完整、有创意且细节丰富，同时需要确保情节逻辑严密。然而，现有的大模型在长文本生成方面存在局限，尤其是在前后文的连贯性和细节处理上容易出现问题。
 
