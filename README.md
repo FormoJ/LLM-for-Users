@@ -58,6 +58,7 @@ ing
 https://github.com/InternLM/Tutorial
 
 # 参考文档：
+- [剧本杀入门：最完整详细模板](https://mp.weixin.qq.com/s/mLJ09J9pB2MwpyjQsEQDfQ)
 - https://github.com/InternLM/Tutorial/blob/camp4/docs/L1/Prompt/practice.md
 - https://github.com/iEdric/chinese-shortscript
 - https://github.com/TeamWiseFlow/awada
