@@ -170,6 +170,30 @@ class BookWriter:
                 print(f"Attempt {attempt + 1} failed: {e}")
         return response
 
+    def clean_json_response(self, response: str) -> str:
+        """ 清理JSON格式，转换为人类易读的文本。 """
+        # 假设已经解析JSON数据并转换为Python字典
+        data = json.loads(response)
+        
+        # 提取有用信息
+        book_title = data.get("intro", {}).get("title", "未定标题")
+        book_intro = data.get("intro", {}).get("intro", "未提供简介")
+        character_name = data.get("character", "未知角色")
+        character_age = data.get("age", "未知年龄")
+        character_profession = data.get("profession", "未知职业")
+        character_secrets = data.get("secrets", {})
+        
+        # 拼接人类可读格式
+        formatted_response = f"书名：{book_title}\n简介：{book_intro}\n\n"
+        formatted_response += f"人物：{character_name} ({character_age}岁，职业：{character_profession})\n"
+        
+        if character_secrets:
+            formatted_response += "人物秘密：\n"
+            for secret_type, secret_desc in character_secrets.items():
+                formatted_response += f"- {secret_type}: {secret_desc}\n"
+        
+        # 其他必要的字段
+        return formatted_response
     def generate_chapter(self, book_content, chapter_intro, prompt_file= "prompts/character_info_writer.txt") -> str:
         """生成单个人物的内容。
 
@@ -190,10 +214,11 @@ class BookWriter:
             try:
                 response = self.assistant.run(prompt, stream=False)
                 response.strip()
-                if response.startswith('```markdown'):
+                if response.startswith('```json'):
                     # 删除第一行和最后一行
-                    lines = response.splitlines()
-                    response = '\n'.join(lines[1:-1])
+                    # lines = response.splitlines()
+                    # response = '\n'.join(lines[1:-1])
+                     response = self.clean_json_response(response)
 
                 return response
             except Exception as e:
@@ -201,6 +226,22 @@ class BookWriter:
         response = convert_latex_to_markdown(response)
         return response
     
+    def format_clue_search(self, discuss_content: dict) -> str:
+        """将线索 JSON 格式转化为可读文本格式。"""
+        
+        formatted_response = ""
+        
+        for scene_key, scene_data in discuss_content.items():
+            scene_name = scene_data["场景名称"]
+            clues = scene_data["线索"]
+            
+            formatted_response += f"\n场景：{scene_name}\n"
+            formatted_response += "线索：\n"
+            
+            for idx, clue in enumerate(clues, 1):
+                formatted_response += f"  {idx}. {clue}\n"
+        
+        return formatted_response
     def generate_clue_search(self, intro, char_outline=None,char_info=None, prompt_file = "prompts/clue_search_writer.txt") -> Tuple[str]:
         """生成剧本杀线索收集阶段等。
 
@@ -226,16 +267,72 @@ class BookWriter:
                     response = response.split('}', 1)[0] + '}'
 
                 clue_search = json.loads(response)
-                clue_search = json.dumps(clue_search, ensure_ascii=False, indent=4)
+                # clue_search = json.dumps(clue_search, ensure_ascii=False, indent=4)
                 # print("经过处理的线索搜证")
                 # print(clue_search)
                 #print(book_title_and_intro)
+                readable_content = self.format_clue_search(clue_search)
 
-                return clue_search
+                return readable_content
             except Exception as e:
                 print(f"Attempt {attempt + 1} failed: {e}")
         return response
 
+    def format_discuss(self, discuss_content: dict) -> str:
+        """将生成的讨论内容转化为可读文本格式。"""
+        formatted_response = ""
+
+        # 处理“圆桌阶段”部分
+        if "圆桌阶段" in discuss_content:
+            formatted_response += "圆桌阶段：\n"
+            for question, question_text in discuss_content["圆桌阶段"].items():
+                formatted_response += f"  {question}: {question_text}\n"
+
+        # 处理“真相解析”部分
+        if "真相解析" in discuss_content:
+            formatted_response += "\n真相解析：\n"
+            
+            # 圆桌答案
+            if "圆桌答案" in discuss_content["真相解析"]:
+                formatted_response += "  圆桌答案:\n"
+                for answer in discuss_content["真相解析"]["圆桌答案"]:
+                    formatted_response += f"    {answer}\n"
+
+            # 整体背景故事和设定
+            if "整体背景故事和设定" in discuss_content["真相解析"]:
+                formatted_response += f"\n  整体背景故事和设定:\n    {discuss_content['真相解析']['整体背景故事和设定']}\n"
+            
+            # 推理思路和关键线索
+            if "推理思路和关键线索" in discuss_content["真相解析"]:
+                formatted_response += "\n  推理思路和关键线索:\n"
+                for line in discuss_content["真相解析"]["推理思路和关键线索"]:
+                    formatted_response += f"    - {line}\n"
+
+            # 问题解答
+            if "问题解答" in discuss_content["真相解析"]:
+                formatted_response += "\n  问题解答:\n"
+                for question, answer in discuss_content["真相解析"]["问题解答"].items():
+                    formatted_response += f"    {question}: {answer}\n"
+            
+            # 总时间线
+            if "总时间线" in discuss_content["真相解析"]:
+                formatted_response += "\n  总时间线:\n"
+                for day, event in discuss_content["真相解析"]["总时间线"].items():
+                    formatted_response += f"    {day}: {event}\n"
+
+        # 处理“故事结局”部分
+        if "故事结局" in discuss_content:
+            formatted_response += f"\n故事结局:\n  {discuss_content['故事结局']}\n"
+        if formatted_response=="":
+            return discuss_content
+
+        return formatted_response
+    def clean_response(self, response: str) -> str:
+        """清理 JSON 字符串中的多余换行符和空白字符。"""
+        response = response.replace("\n", " ").replace("\r", "")
+        # 去除 JSON 中的多余空白字符
+        response = " ".join(response.split())
+        return response
     def generate_discuss(self, intro, char_outline,clue_search_content,char_info=None, prompt_file = "prompts/discuss_writer.txt") -> Tuple[str, str]:
         """生成剧本杀线索收集阶段等。
 
@@ -253,17 +350,20 @@ class BookWriter:
                 response = self.assistant.run(prompt, stream=False)
                 # convert to json
                 response = response.strip()
+                response = self.clean_response(response)
                 if not response.startswith('{'):
                     response = '{' + response.split('{', 1)[1]
                 if not response.endswith('}'):
                     response = response.split('}', 1)[0] + '}'
 
                 discuss_content = json.loads(response)
-                discuss_content = json.dumps(discuss_content, ensure_ascii=False, indent=4)
 
-                #print(book_title_and_intro)
+                # discuss_content = json.dumps(discuss_content, ensure_ascii=False, indent=4)
 
-                return discuss_content
+                print("格式化之前为\n：",discuss_content)
+                readable_content = self.format_discuss(discuss_content)
+                print("格式化之后为\n：",readable_content)
+                return readable_content
             except Exception as e:
                 print(f"Attempt {attempt + 1} failed: {e}")
         return response
@@ -313,7 +413,7 @@ class BookWriter:
         print("线索搜证:")
 
         # print(clue_search_content,"clue_search_content的数据类型是：",type(clue_search_content))
-        book_content += f"\n\n#线索搜证\n{clue_search_content}"
+        book_content += f"\n\n\n#线索搜证\n{clue_search_content}"
 
 
         print("\n开始生成问题与解析...")
