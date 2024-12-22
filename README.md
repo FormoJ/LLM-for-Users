@@ -34,6 +34,38 @@ python script_writer.py
 ```
 ### 本地运行
 ing
+
+## 增量预训练
+
+为使Internlm-2.5-7B模型能具有更好的生成剧本杀中角色对话的能力，本项目使用XTuner工具，讲模型在涉案剧本的对话数据集上进行增量预训练
+
+剧本来源：https://github.com/iEdric/chinese-shortscript
+
+对该仓库中的涉案短剧剧本进行基于GPT的对话提取，将提取好的对话整理为如下所示的XTuner微调所需的json格式，整理好的数据已放在./data/pretrain中
+
+```json
+[
+  {
+      "text": "xxx"
+  },
+  {
+      "text": "xxx"
+  },
+  ...
+]
+```
+
+XTuner自定义预训练文档：https://xtuner.readthedocs.io/zh-cn/latest/training/custom_pretrain_dataset.html
+
+对话提取所使用方法：https://github.com/KMnO4-zx/extract-dialogue
+
+自行下载Internlm-2.5-7B模型放在./models中，运行如下命令即可开始增量预训练，该命令详解请参考XTuner文档
+
+```bash
+# 请将NPROC_PER_NODE设为您要使用的GPU数量，${SAVE_PATH}更改为您指定的保存路径
+NPROC_PER_NODE=1 xtuner train ./configs/pretrain.py --deepspeed deepspeed_zero1 --work-dir ${SAVE_PATH}
+```
+
 ## 项目进展
 ### 近期工作
 1. 改进人物剧情生成方式
@@ -63,3 +95,4 @@ https://github.com/InternLM/Tutorial
 - https://github.com/iEdric/chinese-shortscript
 - https://github.com/TeamWiseFlow/awada
 - https://github.com/KMnO4-zx/extract-dialogue
+- https://xtuner.readthedocs.io/zh-cn/latest/training/custom_pretrain_dataset.html
