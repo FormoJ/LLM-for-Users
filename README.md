@@ -1,7 +1,5 @@
 # 剧本杀剧本生成器
 ## 前言
-由于这个REPO是我一个人在做，有许多未完善之处，万望海涵。
-
 欢迎大家一起加入维护这个开源项目，也可以申请加入我的书生实战营团队，提供免费的算力支持
 
 InternStudio：https://studio.intern-ai.org.cn/
@@ -60,6 +58,7 @@ ing
 https://github.com/InternLM/Tutorial
 
 # 参考文档：
+- [剧本杀入门：最完整详细模板](https://mp.weixin.qq.com/s/mLJ09J9pB2MwpyjQsEQDfQ)
 - https://github.com/InternLM/Tutorial/blob/camp4/docs/L1/Prompt/practice.md
 - https://github.com/iEdric/chinese-shortscript
 - https://github.com/TeamWiseFlow/awada
