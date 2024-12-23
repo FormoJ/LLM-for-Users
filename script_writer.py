@@ -11,6 +11,7 @@ from phi.llm.openai import OpenAIChat
 # 加载 .env 文件
 load_dotenv()
 
+
 def read_prompt(prompt_file: str, replacements: Dict[str, str]) -> str:
     """
     读取提示文件并替换占位符
@@ -22,6 +23,52 @@ def read_prompt(prompt_file: str, replacements: Dict[str, str]) -> str:
     return prompt
 
 class PuyuAPIClient:
+    """处理与AI API的所有交互。"""
+
+    def __init__(self, api_key, base_url, model_name):
+        """初始化APIClient。"""
+        api_key = os.getenv("PUYU_API_KEY")
+        base_url = os.getenv("PUYU_BASE_URL")
+        model_name = os.getenv("PUYU_MODEL_NAME")
+        self.api_key = api_key
+        self.api_url = base_url
+        self.model_name = model_name
+        # import pdb; pdb.set_trace() # 终端程序进入调试
+
+    def call_api(self, messages: List[Dict[str, str]], max_tokens: int = 4096) -> str:
+        """调用AI API并返回生成的文本。
+
+        Args:
+            messages: 要发送给API的消息列表。
+            max_tokens: 响应中的最大标记数。
+
+        Returns:
+            API返回的生成文本。
+
+        Raises:
+            requests.RequestException: 如果API调用失败。
+        """
+        client = openai.OpenAI(api_key=self.api_key, base_url=self.api_url)
+
+        try:
+            response = client.chat.completions.create(
+                model=self.model_name,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=0.7,
+                top_p=0.7,
+                frequency_penalty=0.5,
+                n=1
+            )
+
+            for choice in response.choices:
+                return choice.message.content.strip()
+
+        except openai.OpenAIError as e:
+            print(f"API调用失败: {e}")
+            raise
+'''
+class LocalAPIClient:
     """处理与AI API的所有交互。"""
 
     def __init__(self, api_key, base_url, model_name):
@@ -65,6 +112,7 @@ class PuyuAPIClient:
         except openai.OpenAIError as e:
             print(f"API调用失败: {e}")
             raise
+'''
 
 def convert_latex_to_markdown(text):
     # 使用正则表达式替换公式开始和结束的 \[ 和 \]，但不替换公式内部的
@@ -432,14 +480,30 @@ class BookWriter:
             
             print(f"剧本内容已保存到 {filename} 文件中。")
         return book_content
-
+'''
+def git_model_name(api_key,base_url="http://0.0.0.0:23333/v1"):
+    client = openai.OpenAI(
+    api_key='YOUR_API_KEY',  
+    # 替换为你的OpenAI API密钥，由于我们使用的本地API，无需密钥，任意填写即可
+    base_url="http://0.0.0.0:23333/v1"  
+    # 指定API的基础URL，这里使用了本地地址和端口
+)
+    model_name = client.models.list().data[0].id
+    return model_name
+'''
 def main():
     """主函数, 演示如何使用BookWriter类。"""
     book_theme = input("请输入剧本杀的主题(如：炙手可热的模特刀鱼哥在一次聚会后神秘死亡，心理医生林雪成为首要嫌疑人。随着调查深入，隐藏的秘密逐渐浮出水面，每个角色都有自己的动机和隐情。玩家们需要通过线索搜寻和推理，揭开这场谋杀背后的真相。): ")
+    
+    if True:
+        api_key = os.getenv("API_KEY")
+        base_url = os.getenv("BASE_URL")
+        model_name = os.getenv("MODEL_NAME")
+    else:
+        api_key = os.getenv("API_KEY")
+        base_url = "http://0.0.0.0:23333/v1"  
+        model_name = "/root/models/internlm2_5-7b-chat"
 
-    api_key = os.getenv("API_KEY")
-    base_url = os.getenv("BASE_URL")
-    model_name = os.getenv("MODEL_NAME")
     script_prompt = "你是一个专业的剧本杀创作助手，正在帮助用户写剧本杀剧本。"
     print(base_url, model_name)
     save_path = "books/"
