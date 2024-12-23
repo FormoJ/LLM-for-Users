@@ -62,8 +62,9 @@ XTuner自定义预训练文档：https://xtuner.readthedocs.io/zh-cn/latest/trai
 自行下载Internlm-2.5-7B模型放在./models中，运行如下命令即可开始增量预训练，该命令详解请参考XTuner文档
 
 ```bash
+cd configs/pretrain
 # 请将NPROC_PER_NODE设为您要使用的GPU数量，${SAVE_PATH}更改为您指定的保存路径
-NPROC_PER_NODE=1 xtuner train ./configs/pretrain.py --deepspeed deepspeed_zero1 --work-dir ${SAVE_PATH}
+NPROC_PER_NODE=1 xtuner train pretrain.py --deepspeed deepspeed_zero1 --work-dir ${SAVE_PATH}
 ```
 
 ## 项目进展
