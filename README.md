@@ -128,3 +128,5 @@ https://github.com/InternLM/Tutorial
 - https://github.com/iEdric/chinese-shortscript
 - https://github.com/TeamWiseFlow/awada
 - https://github.com/KMnO4-zx/extract-dialogue
+- [电影英文剧本](https://github.com/saxenarohit/MovieSum)  # 需转中文
+- https://www.juben.pro/    # 写爬虫中~
